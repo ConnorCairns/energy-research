@@ -1,0 +1,44 @@
+end_times:
+  12-17-51.CSV: 2021-11-25 11:11:00
+  13-05-21.CSV: 2021-11-23 10:47:00
+  11-43-06.CSV: 2021-11-29 15:06:00
+  15-11-50.CSV: 2021-12-02 09:47:30
+  10-03-50.CSV: 2021-12-07 14:11:00
+  16-20-23.CSV: 2021-12-13 10:45:30
+  10-51-15.CSV: 2021-12-13 14:47:45
+  17-09-30.CSV: 2022-01-10 08:00:00
+  10-30-06.CSV: 2022-01-11 13:01:16
+  11-35-36.CSV: 2022-01-18 13:08:15
+  16-30-32.CSV: 2022-01-24 15:48:00
+  16-28-55.CSV: 2022-01-27 14:23:30
+  14-25-14.CSV: 2022-01-28 11:38:01
+  11-40-52.CSV: 2022-02-01 09:31:00
+  09-37-42.CSV: 2022-02-03 14:47:15
+  14-50-41.CSV: 2022-02-06 18:23:23
+  18-28-26.CSV: 2022-02-10 09:27:15
+
+  
+Notes:
+  db_vlc.json: |
+    Recordings of VLC decoding everything on ext disk on dell 5480
+  
+
+  dl-pm: |
+    pi was running idle from 13.12. afternoon to 14.12. around 12.00 noon
+
+  missing_end_date: | 
+    if the measurement end time was not recorded, reconstruct it like this:
+    import  numpy as np
+    a = np.array([0.979834,
+    0.980979,
+    0.981600,
+    0.980722,
+    0.966490])
+    a.mean()
+    #%%
+    import datetime
+
+    import pandas as pd
+    df = pd.read_csv('/Users/csxds/workspaces/students/video_codec_lily/measurements/10-30-06.CSV', skiprows=8, names=['time', 'power'], usecols=(0, 1))
+    end = start + datetime.timedelta(0,len(df) * 0.977925)
+    print(end)
