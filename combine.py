@@ -11,7 +11,8 @@ def round_seconds(time):
         time += timedelta(0, 1)
     return time.replace(microsecond=0)
 
-
+#Assumes log file is of format 'XXXX-XX-XX xx:xx:xx.xxx,power' on each line with no header
+#If there is a header may need to manually remove it
 def get_df_format1(power_log):
     return pd.read_csv(power_log, sep=',', names=['datetime', 'power'], dtype={'datetime': "string", "power": "float16"}, usecols=(0, 1), low_memory=False)
 
@@ -31,8 +32,6 @@ def get_log_times(header_info, size):
     return log_times
 
 # Old format - this is for files of format XX-XX-XX.CSV
-
-
 def get_df_format2(power_log):
     # Want to extract header info to get start time
     header_info = []
@@ -82,15 +81,15 @@ def combine_logs(power_logs):
         power_logs_list.append(df)
         print(f"added {power_log}")
 
-    # Turn list into df
+    # Turn list into df, more efficient to do so this way rather than append to existing df
     df = pd.concat(power_logs_list, axis=0, ignore_index=True)
     df['datetime'] = pd.to_datetime(df['datetime'])
     df = df.sort_values(by=['datetime'], ignore_index=True)
 
-    # Drop ms
+    # Drop ms, decided not to do this as accuracy is lost but left in incase plans change
     # df['datetime'] = df['datetime'].apply(lambda x: round_seconds(x))
 
-    # Average when multiple values at same time
+    # Average when multiple values at same time - should only happen when log files overlap so no loss of accuracy
     df = df.groupby('datetime').mean().reset_index()
 
     # Removing standard index saves LOTS of space
@@ -108,16 +107,10 @@ def load_combined_csv(name):
 
 
 if __name__ == '__main__':
+    #power_logs is array of all logs to combine
     power_logs = glob.glob("power/power_log*.csv")
     df = combine_logs(power_logs)
     print("complete")
 
+    #Change CSV name here if needed
     df.to_csv("grouped_unrounded.csv")
-
-    # print(df)
-
-    # df = load_combined_csv('test5.csv')
-    # print(df.info())
-
-    # TODO: Check for gaps between seconds
-    # TODO: Adjust for 10watt difference
